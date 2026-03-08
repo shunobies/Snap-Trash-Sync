@@ -1,17 +1,57 @@
 # Snap-Trash-Sync
-Developers using Snap like VSCode or VSCodium when delete Snap moves user files from our space into snap trash space and unrecoverable without doing alot of digging.
-I ran into an issue where I accidentally deleted a project file while in VSCodium and it said it moved it to my trash however I couldn't locate it. Discovered that
-in all of Cononicals Wisdom I guess trash needs to be sandboxed as well as everything else I'm sure there is a security justification for this but I'm not sure how
-that would with a code editor other than to be inconvient. Here is the fix.
 
-Debian install
+## Overview
+
+When using snapped versions of VSCode or VSCodium, deleted files are moved to a sandboxed trash directory that is difficult to access. If you accidentally delete a file, you may struggle to locate it in the snap trash space without extensive manual searching.
+
+Snap implements sandboxed storage for security reasons, but this approach is inconvenient for development workflows. This tool provides an easy way to recover files by syncing snap trash to your system trash.
+
+## Installation
+
+First, install `trash-cli`:
+
+```bash
 sudo apt install trash-cli
-Move files to your ~/.local/bin/
+```
+
+Copy the script files to your local bin directory:
+
+- `trash-list-snap`
+- `sync-snap-trash`
+
+Make both scripts executable:
+
+```bash
 chmod a+x ~/.local/bin/trash-list-snap
 chmod a+x ~/.local/bin/sync-snap-trash
-trash-list-snap # Will list out the files you currently have stored in your trash cans in snaps
-sync-snap-trash # Meant to be used in a cronjob to move all snap trash files into user trash can
+```
 
-Create a cronjob I have mine set to run every ten minutes but you can run it manually with command sync-snap-trash if you need something immediatly.
+## Usage
+
+List files in your snap trash:
+
+```bash
+trash-list-snap
+```
+
+Sync snap trash files to your system trash:
+
+```bash
+sync-snap-trash
+```
+
+## Automate with Cron
+
+Set up a cron job to automatically sync snap trash at regular intervals. For example, to run every ten minutes:
+
+```bash
 crontab -e
+```
+
+Add the following line:
+
+```bash
 */10 * * * * /home/alex/.local/bin/sync-snap-trash
+```
+
+Adjust the path to match your home directory and modify the interval as needed. Run `sync-snap-trash` manually whenever you need to recover a file immediately.
