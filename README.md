@@ -51,7 +51,7 @@ crontab -e
 Add the following line:
 
 ```bash
-*/10 * * * * /home/alex/.local/bin/sync-snap-trash
+*/10 * * * * $HOME/.local/bin/sync-snap-trash
 ```
 
-Adjust the path to match your home directory and modify the interval as needed. Run `sync-snap-trash` manually whenever you need to recover a file immediately.
+Adjust the interval as needed. Run `sync-snap-trash` manually whenever you need to recover a file immediately.
