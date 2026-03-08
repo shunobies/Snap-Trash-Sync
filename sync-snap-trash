@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Log file for cron job
+LOG_FILE="$HOME/.local/log/snap-trash-sync.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+{
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting snap trash sync..."
+  
+  # Use shopt to handle non-matching globs
+  shopt -s nullglob
+  snap_trash_dirs=(~/snap/*/*/.local/share/Trash/files/)
+  shopt -u nullglob
+
+  # Deduplicate the directories
+  unique_dirs=($(printf '%s\n' "${snap_trash_dirs[@]}" | sort -u))
+
+  if [ ${#unique_dirs[@]} -gt 0 ]; then
+    # Collect all unique files (deduplicate by filename)
+    declare -A seen_files
+    files_to_move=()
+    
+    for dir in "${unique_dirs[@]}"; do
+      for file in "$dir"/*; do
+        if [ -e "$file" ]; then
+          filename=$(basename "$file")
+          # Only add if we haven't seen this filename before
+          if [ -z "${seen_files[$filename]}" ]; then
+            files_to_move+=("$file")
+            seen_files[$filename]=1
+          fi
+        fi
+      done
+    done
+    
+    if [ ${#files_to_move[@]} -gt 0 ]; then
+      echo "Moving ${#files_to_move[@]} files to system trash..."
+      for file in "${files_to_move[@]}"; do
+        trash-put "$file" 2>/dev/null && echo "✓ Moved: $(basename "$file")"
+      done
+    else
+      echo "No files to move"
+    fi
+  else
+    echo "No snap trash found"
+  fi
+  
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] Sync complete"
+  
+} >> "$LOG_FILE" 2>&1
