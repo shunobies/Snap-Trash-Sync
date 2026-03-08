@@ -2,7 +2,7 @@
 echo "=== Snap Codium Trash ==="
 # Use shopt to handle non-matching globs
 shopt -s nullglob
-snap_trash_dirs=(~/snap/*/*/.local/share/Trash/files/)
+snap_trash_dirs=($HOME/snap/*/*/.local/share/Trash/files/)
 shopt -u nullglob
 
 # Deduplicate the directories
